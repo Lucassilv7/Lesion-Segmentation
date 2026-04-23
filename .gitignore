@@ -211,3 +211,6 @@ Datasets/
 Referencial_Teorico/
 Codigos/benign/
 Codigos/malignant/
+Codigos/results_clip_limit/
+Codigos/results_dhr_clahe/
+
