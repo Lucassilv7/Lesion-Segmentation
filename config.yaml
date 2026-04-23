@@ -1,0 +1,63 @@
+# =============================================================================
+# Configurações do Pipeline de Pré-processamento
+# Segmentação Automática de Lesões Dermatológicas — IC UFERSA
+# =============================================================================
+
+# --- Dados ---
+data:
+  dataset: "ISIC2018"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  image_extensions: [".jpg", ".jpeg", ".png"]
+
+# --- Saída ---
+results:
+  figures_dir: "results/figures"
+  metrics_dir: "results/metrics"
+  preprocessed_dir: "results/preprocessed_imgs"
+
+# --- Pré-processamento (ordem do pipeline) ---
+# 1. Color Constancy → 2. Hair Removal → 3. CLAHE → 4. Resize → 5. Normalize
+
+preprocessing:
+
+  color_constancy:
+    method: "shades_of_gray"  # opções: "shades_of_gray", "gray_world"
+    p: 6                       # expoente do shades_of_gray (p=1 equivale ao gray world)
+
+  hair_removal:
+    method: "sharp_razor"      # opções: "sharp_razor", "dull_razor", "none"
+    # sharp_razor
+    min_area: 10               # área mínima de um componente para ser considerado pelo
+    max_solidity: 0.9          # solidez máxima (objetos sólidos não são pelos)
+    inpaint_radius: 3          # raio do inpainting (cv2.INPAINT_NS)
+
+  clahe:
+    clip_limit: 0.5            # valor encontrado como melhor nos seus testes
+    tile_grid_size: [8, 8]
+
+  resize:
+    width: 256
+    height: 256
+    image_interpolation: "bilinear"         # para imagens RGB
+    mask_interpolation: "nearest_neighbor"  # para máscaras binárias (ground truth)
+
+  normalize:
+    enabled: true
+    scale: 255.0               # divide cada pixel por esse valor → range [0, 1]
+
+# --- Experimentos de comparação ---
+# Usado pelo notebook 03_eval_methods.ipynb para varrer parâmetros
+experiments:
+  clip_limit_search:
+    start: 0.5
+    stop: 2.5
+    step: 0.25
+
+  pipelines_to_compare:
+    - name: "cc_hr_clahe"
+      description: "Color Constancy → Hair Removal → CLAHE"
+    - name: "cc_clahe_hr"
+      description: "Color Constancy → CLAHE → Hair Removal"
+    - name: "cc_hr"
+      description: "Color Constancy → Hair Removal (sem CLAHE)"
