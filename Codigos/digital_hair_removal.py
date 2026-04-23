@@ -139,7 +139,7 @@ def sharp_razor(img_bgr: np.ndarray) -> tuple:
     # Inpaint the original image using the clean mask
     inpainted = cv2.inpaint(img_bgr, clean_mask, 3, cv2.INPAINT_NS)
 
-    return inpainted, brute_mask, clean_mask
+    return inpainted
 
 def dhr(img_bgr: np.ndarray):
   
@@ -149,7 +149,7 @@ def dhr(img_bgr: np.ndarray):
 
     log_result = laplacian_of_gaussian(img_bgr)
 
-    sharp_razor_result, brute_mask, clean_mask = sharp_razor(img_bgr)
+    sharp_razor_result = sharp_razor(img_bgr)
 
     print("Processing complete. Displaying results...")
     # Display the original and processed images
@@ -182,3 +182,27 @@ def dhr(img_bgr: np.ndarray):
     plt.tight_layout()
     plt.show()
 
+    # Show Image Original and Sharp Razor Result (Inpainted, Brute Mask and Clean Mask)
+    """ plt.figure(figsize=(15, 10))
+    plt.subplot(2, 2, 1)
+    plt.title("Original Image")
+    plt.imshow(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB))
+    plt.axis('off')
+
+    plt.subplot(2, 2, 2)
+    plt.title("Sharp Razor Result")
+    plt.imshow(cv2.cvtColor(sharp_razor_result, cv2.COLOR_BGR2RGB)) 
+    plt.axis('off')
+
+    plt.subplot(2, 2, 3)
+    plt.title("Brute Mask")
+    plt.imshow(brute_mask, cmap='gray')
+    plt.axis('off')
+
+    plt.subplot(2, 2, 4)
+    plt.title("Clean Mask")
+    plt.imshow(clean_mask, cmap='gray') 
+    plt.axis('off')
+
+    plt.tight_layout()  
+    plt.show() """
