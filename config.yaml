@@ -43,8 +43,12 @@ preprocessing:
     mask_interpolation: "nearest_neighbor"  # para máscaras binárias (ground truth)
 
   normalize:
-    enabled: true
+    enabled: false
     scale: 255.0               # divide cada pixel por esse valor → range [0, 1]
+
+segmentation:
+
+  traditional_method: ["otsu", "watershed", "grabcut"]  # opções: "otsu", "watershed", "grabcut"
 
 # --- Experimentos de comparação ---
 # Usado pelo notebook 03_eval_methods.ipynb para varrer parâmetros

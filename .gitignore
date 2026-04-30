@@ -4,17 +4,16 @@ venv/
 env/
 
 # Dataset — nunca versionar imagens médicas
-data/raw/
-data/processed/
-results/preprocessed_imgs/
-Datasets/
+skin_lesion/data/raw
+skin_lesion/data/processed
+skin_lesion/results/preprocessed_imgs/
 
 # Referencial bibliográfico
 Referencial_Teorico/
 
 # Outputs gerados automaticamente
-results/figures/
-results/metrics/
+skin_lesion/results/figures/
+skin_lesion/results/metrics/
 __pycache__/
 *.pyc
 *.pyo

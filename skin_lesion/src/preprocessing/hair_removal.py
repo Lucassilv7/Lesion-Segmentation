@@ -96,6 +96,79 @@ def dull_razor(img_bgr: np.ndarray, inpaint_radius: int = 6) -> np.ndarray:
     return cv2.medianBlur(inpainted, 3)
 
 
+def canny_plus_coherence_transport(img_bgr: np.ndarray) -> np.ndarray:
+    """ 
+    Remove pelos usando detecção de bordas Canny + inpainting por transporte de coerência.
+    Algoritmo mais avançado que pode preservar melhor texturas e bordas da lesão, mas é mais complexo
+
+    Args:
+        img_bgr: Imagem no espaço BGR (uint8).
+
+    Returns:
+        Imagem sem pelos no espaço BGR (uint8).
+    
+    """
+    gray_bgr = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+
+    # Convert to float for Wiener filter
+    gray_float = gray_bgr.astype(np.float64)
+
+    # Filter the image to reduce noise (ignorando os avisos irritantes do console)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        filtered_float = wiener(gray_float, (3, 3))
+
+    # Remove NaN values that may arise from the Wiener filter
+    filtered_float = np.nan_to_num(filtered_float, nan=0.0)
+    filtered_uint8 = np.clip(filtered_float, 0, 255).astype(np.uint8)
+
+    # Calculate the median intensity of the image
+    median = np.median(filtered_uint8)
+
+    lower = int(max(0, 0.7 * median))
+    upper = int(min(255, 1.3 * median))
+
+    # Apply Canny detection
+    edges = cv2.Canny(filtered_uint8, lower, upper)
+
+    # Dilate the edges to create a thicker mask
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    dilated_edges = cv2.dilate(edges, kernel, iterations=1)
+
+    # Inpaint the original image using the dilated edge mask    
+    inpainted = cv2.inpaint(img_bgr, dilated_edges, 3, cv2.INPAINT_NS)
+
+    return inpainted
+
+def laplacian_of_gaussian(img_bgr: np.ndarray) -> np.ndarray:
+    """
+    Remove pelos usando o filtro Laplacian of Gaussian (LoG) para detectar bordas finas, seguido de inpainting.
+    Algoritmo é simples e pode ser eficaz para casos onde os pelos são finos e contrastantes, mas pode não ser tão robusto quanto os métodos baseados em morfologia ou gradientes direcionais.
+
+    Args:
+        img_bgr: Imagem no espaço BGR (uint8).
+
+    Returns:
+        Imagem sem pelos no espaço BGR (uint8).
+    """
+    # Convert to grayscale
+    gray_bgr = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    
+    # Apply Laplacian of Gaussian
+    log = gaussian_laplace(gray_bgr, sigma=1)
+
+    # Threshold the LoG result to create a binary mask
+    _, mask = cv2.threshold(log.astype(np.uint8), 10, 255, cv2.THRESH_BINARY)
+
+    closing_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    closed_mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, closing_kernel)
+
+    # Inpaint the original image using the mask
+    inpainted = cv2.inpaint(img_bgr, closed_mask, 3, cv2.INPAINT_TELEA)
+
+    return inpainted
+
+
 def no_removal(img_bgr: np.ndarray) -> np.ndarray:
     """Passthrough — sem remoção de pelos (para experimentos de ablação)."""
     return img_bgr
@@ -105,5 +178,7 @@ def no_removal(img_bgr: np.ndarray) -> np.ndarray:
 METHODS = {
     "sharp_razor": sharp_razor,
     "dull_razor": dull_razor,
-    "none": no_removal,
+    "canny_plus_coherence_transport": canny_plus_coherence_transport,
+    "laplacian_of_gaussian": laplacian_of_gaussian,
+    "none": no_removal
 }

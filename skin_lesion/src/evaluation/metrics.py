@@ -17,6 +17,7 @@ from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 
 
+
 def calculate_ssim_psnr(
     original: np.ndarray,
     processed: np.ndarray,
