@@ -59,7 +59,7 @@ result_uint8 = pipeline.run(img, normalize=False)  # retorna uint8 para visualiz
 
 Para explorar e comparar métodos, abra o notebook:
 ```bash
-jupyter notebook notebooks/02_preprocessing.ipynb
+jupyter notebook notebooks/01_preprocessing.ipynb
 ```
 
 ## Pipeline de Pré-processamento
