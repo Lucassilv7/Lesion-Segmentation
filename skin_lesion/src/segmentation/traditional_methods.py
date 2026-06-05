@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from collections import deque
 
 def segment_otsu(img_bgr: np.ndarray) -> np.ndarray:
     """
@@ -83,8 +84,64 @@ def segment_grabcut(img_bgr: np.ndarray, rect: tuple = None, iterations: int = 5
     
     return binary_mask
 
+_PALETA = [
+    (230,  25,  75), ( 60, 180,  75), (255, 225,  25), (  0, 130, 200),
+    (245, 130,  48), (145,  30, 180), ( 70, 240, 240), (240,  50, 230),
+    (210, 245,  60), (250, 190, 212), (  0, 128, 128), (220, 190, 255),
+    (170, 110,  40), (255, 250, 200), (128,   0,   0), (170, 255, 195),
+    (128, 128,   0), (255, 215, 180), (  0,   0, 128), (128, 128, 128),
+]
+
+_VIZINHOS_8 = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
+
+def segment_region_growing(img: np.ndarray, seeds: list, T: float) -> np.ndarray:
+    """
+    Segmentação por crescimento de região com BFS.
+ 
+    Parâmetros:
+        img     : imagem RGB de entrada
+        sementes: lista de tuplas (y, x)  — coordenadas das sementes
+        T       : limiar de diferença de intensidade
+ 
+    Retorna imagem pseudocolorida RGB onde cada região tem uma cor distinta
+    e pixels não atribuídos ficam pretos.
+    """
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    height, width = gray.shape
+    labels = np.zeros((height, width), dtype=np.int32)  # 0 = sem rótulo
+
+    queeue = deque()
+
+    # Inicializa sementes
+    for idx, (sy, sx) in enumerate(seeds):
+        label = idx + 1  
+        labels[sy, sx] = label
+        queeue.append((sy, sx, label, gray[sy, sx]))
+
+    # BFS
+    while queeue:
+        y, x, label, seed_value = queeue.popleft()
+        for dy, dx in _VIZINHOS_8:
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < height and 0 <= nx < width and labels[ny, nx] == 0:
+                if abs(float(gray[ny, nx]) - float(seed_value)) <= T:
+                    labels[ny, nx] = label
+                    queeue.append((ny, nx, label, seed_value))
+    
+    # Pseudocolorização
+    results = np.zeros((height, width, 3), dtype=np.uint8)
+    for label in range(1, len(seeds) + 1):
+        color = _PALETA[(label - 1) % len(_PALETA)]
+        mask = labels == label
+        results[mask] = color
+    
+    return results
+
+
+
 METHODS = {
     "otsu": segment_otsu,
     "watershed": segment_watershed,
     "grabcut": segment_grabcut,
+    "region_growing": segment_region_growing,
 }

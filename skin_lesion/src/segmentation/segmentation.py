@@ -30,6 +30,10 @@ class Segmentation:
         fn = TRAD_METHODS["grabcut"]
         return fn(img)
     
+    def step_segment_traditional_region_growing(self, img: np.ndarray, seeds: list, T: float) -> np.ndarray:
+        fn = TRAD_METHODS["region_growing"]
+        return fn(img, seeds, T)
+    
     # ------------------------------------------------------------------
     # Execução completa
     # ------------------------------------------------------------------
