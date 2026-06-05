@@ -7,16 +7,16 @@ Dataset: [ISIC 2018](https://challenge.isic-archive.com/data/#2018).
 
 ```
 skin-lesion-ic/
-├── config.yaml                  ← todos os hiperparâmetros aqui
+├── config.yaml                  
 ├── requirements.txt
 │
 ├── data/
-│   ├── raw/                     ← imagens originais do ISIC (não versionar)
+│   ├── raw/                     
 │   └── processed/               ← splits de treino/val/test
 │
 ├── src/
 │   ├── preprocessing/
-│   │   ├── pipeline.py          ← orquestrador principal
+│   │   ├── pipeline.py          
 │   │   ├── color_constancy.py
 │   │   ├── hair_removal.py
 │   │   └── clahe.py
@@ -25,14 +25,14 @@ skin-lesion-ic/
 │   └── utils.py
 │
 ├── notebooks/
-│   ├── 01_explore_dataset.ipynb
-│   ├── 02_preprocessing.ipynb   ← comparação de métodos e parâmetros
-│   └── 03_eval_methods.ipynb
+│   ├── 01_preprocessing.ipynb
+│   ├── 02_segmentation.ipynb
+│   └── 03_unet.ipynb
 │
 └── results/
-    ├── figures/                 ← gráficos salvos
-    ├── metrics/                 ← CSVs de avaliação
-    └── preprocessed_imgs/       ← imagens processadas
+    ├── figures/                 
+    ├── metrics/                 
+    └── preprocessed_imgs/       
 ```
 
 ## Setup
@@ -59,7 +59,7 @@ result_uint8 = pipeline.run(img, normalize=False)  # retorna uint8 para visualiz
 
 Para explorar e comparar métodos, abra o notebook:
 ```bash
-jupyter notebook notebooks/02_preprocessing.ipynb
+jupyter notebook notebooks/01_preprocessing.ipynb
 ```
 
 ## Pipeline de Pré-processamento
