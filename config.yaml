@@ -26,7 +26,7 @@ preprocessing:
     p: 6                       # expoente do shades_of_gray (p=1 equivale ao gray world)
 
   hair_removal:
-    method: "sharp_razor"      # opções: "sharp_razor", "dull_razor", "none"
+    method: "dull_razor"      # opções: "sharp_razor", "dull_razor", "none"
     # sharp_razor
     min_area: 10               # área mínima de um componente para ser considerado pelo
     max_solidity: 0.9          # solidez máxima (objetos sólidos não são pelos)
@@ -49,6 +49,10 @@ preprocessing:
 segmentation:
 
   traditional_method: ["otsu", "watershed", "grabcut"]  # opções: "otsu", "watershed", "grabcut"
+  
+  region_growing:
+    strategy: "centro + cruz"
+    T: 30
 
 # --- Experimentos de comparação ---
 # Usado pelo notebook 03_eval_methods.ipynb para varrer parâmetros
@@ -65,3 +69,32 @@ experiments:
       description: "Color Constancy → CLAHE → Hair Removal"
     - name: "cc_hr"
       description: "Color Constancy → Hair Removal (sem CLAHE)"
+
+# --- Treino da U-Net ---
+training:
+
+  # Dados
+  train_image_dir: "skin_lesion/data/processed/training/images"
+  train_mask_dir:  "skin_lesion/data/processed/training/masks"
+  val_image_dir:   "skin_lesion/data/processed/validation/images"
+  val_mask_dir:    "skin_lesion/data/processed/validation/masks"
+  checkpoint_dir:  "skin_lesion/results/checkpoints"
+
+  # Hiperparâmetros
+  learning_rate: 1.0e-4
+  batch_size: 8
+  num_epochs: 50
+  num_workers: 2
+  pin_memory: true
+
+  # Modelo
+  in_channels: 3
+  out_channels: 1
+  features: [64, 128, 256, 512, 1024]
+  early_stopping_patience: 20 # para o treino se o Dice não melhorar por N épocas seguidas
+
+  # Data augmentation (aplicado só no treino)
+  augmentation:
+    rotate_limit: 35
+    horizontal_flip_p: 0.5
+    vertical_flip_p: 0.1
