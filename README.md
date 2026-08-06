@@ -73,3 +73,7 @@ jupyter notebook notebooks/01_preprocessing.ipynb
 | Normalize | ÷ 255 | Escala para [0, 1] esperado pela rede |
 
 Configurações detalhadas em `config.yaml`.
+
+## References
+- https://github.com/xmindflow/DermoSegDiff
+- https://github.com/facebookresearch/sam2

@@ -78,23 +78,25 @@ training:
   train_mask_dir:  "skin_lesion/data/processed/training/masks"
   val_image_dir:   "skin_lesion/data/processed/validation/images"
   val_mask_dir:    "skin_lesion/data/processed/validation/masks"
+  test_image_dir:  "skin_lesion/data/processed/test/images"
+  test_mask_dir:   "skin_lesion/data/processed/test/masks"
   checkpoint_dir:  "skin_lesion/results/checkpoints"
 
   # Hiperparâmetros
-  learning_rate: 1.0e-4
-  batch_size: 8
-  num_epochs: 50
-  num_workers: 2
-  pin_memory: true
+  learning_rate: 1.0e-4 # Taxa de aprendizado (ajuste conforme necessário)
+  batch_size: 8 # Tamanho do batch (ajuste conforme a memória disponível)
+  num_epochs: 100 # Número máximo de épocas para o treino (o treino pode parar antes se o early stopping for acionado)
+  num_workers: 2 # Número de subprocessos para carregar os dados (ajuste conforme a CPU disponível)
+  pin_memory: true # Se True, os dados carregados serão mantidos na memória principal (RAM) para acelerar a transferência para a GPU (ajuste conforme a memória disponível)
 
   # Modelo
-  in_channels: 3
-  out_channels: 1
-  features: [64, 128, 256, 512, 1024]
-  early_stopping_patience: 20 # para o treino se o Dice não melhorar por N épocas seguidas
+  in_channels: 3 # número de canais de entrada (imagens RGB)
+  out_channels: 1 # número de canais de saída (máscara binária)
+  features: [64, 128, 256, 512, 1024] # número de filtros em cada camada da U-Net (ajuste conforme a complexidade do problema e a memória disponível)
+  early_stopping_patience: 25 # para o treino se o Dice não melhorar por N épocas seguidas
 
   # Data augmentation (aplicado só no treino)
   augmentation:
-    rotate_limit: 35
-    horizontal_flip_p: 0.5
-    vertical_flip_p: 0.1
+    rotate_limit: 35 # graus de rotação máxima (tanto no sentido horário quanto anti-horário)
+    horizontal_flip_p: 0.5 # probabilidade de aplicar flip horizontal
+    vertical_flip_p: 0.1 # probabilidade de aplicar flip vertical

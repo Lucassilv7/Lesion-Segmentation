@@ -13,6 +13,10 @@ skin_lesion/results/checkpoints/
 # Referencial bibliográfico
 Referencial_Teorico/
 
+# Referencia Reporsitório 
+DermoSegDiff/
+sam2/
+
 # Outputs gerados automaticamente
 skin_lesion/results/figures/
 skin_lesion/results/metrics/
